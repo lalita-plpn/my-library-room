@@ -3,36 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Library Room</title>
-    <link rel="stylesheet" href="style.css"> </head>
+    <title>LIFE PLANNER</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+Thai:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
 <body>
-    <header>
-        <h1>My Library Room</h1>
-        <p>A personal library that gathered links to read or watch</p>
-    </header>
 
-    <main>
-        <section class="category doctor">
-            <h2>🩺 Doctor</h2>
-            <div class="link-card">
-                <a href="#">ชื่อลิงก์บทความแพทย์</a>
-            </div>
-        </section>
+<header>
+  <div>
+    <div class="logo">LIFE<em>.</em>PLN</div>
+    <div class="logo-sub">personal link library</div>
+  </div>
+  <div class="badge-unread" id="badge-num">0 unread</div>
+</header>
 
-        <section class="category money">
-            <h2>💰 Money</h2>
-            <div class="link-card">
-                <a href="#">เทคนิคการออมเงิน</a>
-            </div>
-        </section>
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('doctor',this)">
+    <div class="tab-icon" style="background:var(--red)">🫀</div>
+    <span class="tab-label">Doctor</span>
+  </button>
+  <button class="tab-btn" onclick="switchTab('money',this)">
+    <div class="tab-icon" style="background:var(--gold)">💰</div>
+    <span class="tab-label">Money</span>
+  </button>
+  <button class="tab-btn" onclick="switchTab('selfdev',this)">
+    <div class="tab-icon" style="background:var(--purple)">⚡</div>
+    <span class="tab-label">Self Dev</span>
+  </button>
+</div>
 
-        <section class="category self-dev">
-            <h2>🏃‍♂️ Self Development</h2>
-            <div class="link-card">
-                <a href="#">ตารางซ้อมวิ่ง 10K</a>
-            </div>
-        </section>
-    </main>
+<div class="toolbar">
+  <div class="section-title" id="section-title">Doctor Practice</div>
+  <button class="icon-btn" id="search-btn" onclick="toggleSearch()" title="ค้นหา">🔍</button>
+  <button class="icon-btn" id="sort-btn" onclick="toggleSort()" title="เรียง">↕</button>
+</div>
 
-    <script src="script.js"></script> </body>
+<div class="search-wrap" id="search-wrap">
+  <input class="search-input" id="search-input" placeholder="ค้นหาชื่อลิงก์..." oninput="render()" />
+</div>
+
+<div class="sub-bar">
+  <div class="filter-tabs">
+    <button class="filter-tab active" onclick="setFilter('all',this)">ALL</button>
+    <button class="filter-tab" onclick="setFilter('unread',this)">UNREAD</button>
+    <button class="filter-tab" onclick="setFilter('read',this)">READ</button>
+  </div>
+  <div class="stats-txt">📌<span class="u" id="stat-u">0</span> ✅<span class="r" id="stat-r">0</span></div>
+</div>
+
+<main id="link-list"></main>
+<button class="fab" onclick="openModal()">+</button>
+
+<div class="overlay" id="edit-ov">
+  <div class="sheet">
+    <button class="ov-close" onclick="closeEdit()">✕</button>
+    <div class="ov-title">✏️ แก้ไข</div>
+    <label class="f-label">ชื่อ *</label>
+    <input class="f-input" id="edit-title" placeholder="ชื่อลิงก์..." />
+    <label class="f-label">URL *</label>
+    <input class="f-input" id="edit-url" placeholder="https://..." />
+    <div class="f-row">
+      <div>
+        <label class="f-label">Time (min)</label>
+        <input class="f-input" id="edit-time" type="number" style="margin-bottom:0" />
+      </div>
+      <div>
+        <label class="f-label">Type</label>
+        <div class="radio-row">
+          <label><input type="radio" name="etp" value="read"> Read</label>
+          <label><input type="radio" name="etp" value="watch"> Watch</label>
+        </div>
+      </div>
+    </div>
+    <button class="btn-primary" style="margin-top:10px" onclick="saveEdit()">บันทึก</button>
+    <button class="btn-ghost" onclick="closeEdit()">Cancel</button>
+  </div>
+</div>
+
+<div class="overlay center" id="del-ov">
+  <div class="dialog">
+    <div class="dlg-icon">🗑</div>
+    <div class="dlg-msg">ลบลิงก์นี้?<br>ไม่สามารถกู้คืนได้</div>
+    <div class="dlg-btns">
+      <button class="btn-danger" id="del-yes">ลบเลย</button>
+      <button class="btn-cancel2" id="del-no">ยกเลิก</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="add-ov">
+  <div class="sheet">
+    <button class="ov-close" onclick="closeModal()">✕</button>
+    <div class="ov-title">Add Links</div>
+    <div class="f-section">🔗 URLs (เพิ่มได้หลายลิงก์)</div>
+    <div class="url-list" id="url-list">
+      <div class="url-row">
+        <input class="f-input" placeholder="https://..." />
+      </div>
+    </div>
+    <button class="btn-add-url" onclick="addUrlRow()">+ เพิ่ม URL อีก</button>
+    <div class="f-section">⏱ เวลาอ่าน / ประเภท</div>
+    <div class="f-row">
+      <div>
+        <label class="f-label">Time (min)</label>
+        <input class="f-input" id="inp-time" type="number" value="10" style="margin-bottom:0"/>
+      </div>
+      <div>
+        <label class="f-label">Type</label>
+        <div class="radio-row">
+          <label><input type="radio" name="tp" value="read" checked> Read</label>
+          <label><input type="radio" name="tp" value="watch"> Watch</label>
+        </div>
+      </div>
+    </div>
+    <button class="btn-primary" style="margin-top:14px" onclick="saveLinks()">Save</button>
+    <button class="btn-ghost" onclick="closeModal()">Cancel</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
 </html>
